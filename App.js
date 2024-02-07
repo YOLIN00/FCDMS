@@ -6,6 +6,13 @@ import {
   useColorScheme,
   Appearance,
 } from "react-native";
+import {
+  SafeAreaView,
+  SafeAreaProvider,
+  SafeAreaInsetsContext,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import Signin from "./Screens/Signin";
 
 // import { AppearanceProvider } from "react-native-appearance";
 
@@ -22,21 +29,19 @@ export default function App() {
   const isDarkMode = colorScheme === "dark";
   console.log(colorScheme);
   return (
-    <View style={styles.container}>
-      <Text>Welcome to FCDMS!</Text>
-      <StatusBar
-        style="auto"
-        backgroundColor={isDarkMode ? "#000000" : "#ffffff"}
-      />
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <Signin />
+       </SafeAreaView>
+     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffff00",
-    alignItems: "center",
-    justifyContent: "center",
+    // backgroundColor: "#ffff00",
+    // alignItems: "center",
+    // justifyContent: "center",
   },
 });
