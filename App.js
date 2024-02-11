@@ -12,7 +12,11 @@ import {
   SafeAreaInsetsContext,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+
 import Signin from "./Screens/Signin";
+import Signup from "./Screens/Signup";
+import OrganizationList from "./Screens/OrganizationList";
+import CampaignList from "./Screens/CampaignList";
 
 // import { AppearanceProvider } from "react-native-appearance";
 
@@ -31,17 +35,14 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Signin />
-       </SafeAreaView>
-     </SafeAreaProvider>
+        <CampaignList />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#ffff00",
-    // alignItems: "center",
-    // justifyContent: "center",
   },
 });

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Text } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { Text } from "react-native";
 
-const TypingAnimation = ({style}) => {
-  const [textToShow, setTextToShow] = useState('');
-  const text = 'Welcome Back!'; // Text to animate
+const TypingAnimation = ({ style, text }) => {
+  console.log(text, typeof text);
+  const [textToShow, setTextToShow] = useState("");
+  // Text to animate
   const delay = 100; // Delay between each character (in milliseconds)
 
   useEffect(() => {

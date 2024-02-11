@@ -1,26 +1,89 @@
-import { View, Text, StyleSheet, TextInputBase, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInputBase,
+  TextInput,
+  Animated,
+  Pressable,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import TypingAnimation from "../components/TypeAnimation";
+import { useEffect, useState, useRef } from "react";
+
 export default () => {
+  const [passwordShow, setPasswordShow] = useState(false);
+
+  const translateY = useRef(new Animated.Value(500)).current;
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 1500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
     <View style={style.container}>
-      
-
       <LinearGradient style={style.background} colors={["#4568DC", "#B06AB3"]}>
-      <View style={{ justifyContent: "center", alignItems: "center" ,height:150}}>
-          <Text style={{...style.text,letterSpacing:10}}>FCDS</Text>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            height: 150,
+          }}
+        >
+          <Text style={{ ...style.text, letterSpacing: 10 }}>FCDS</Text>
         </View>
-        <View style={style.main}>
-          <TypingAnimation style={style.header}/>
+        <Animated.View style={[style.main, { transform: [{ translateY }] }]}>
+          <TypingAnimation style={style.header} text="Welcome Back!"/>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Phone:</Text>
             <TextInput style={style.input} keyboardType="phone-pad"></TextInput>
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Password:</Text>
-            <TextInput style={style.input} secureTextEntry={true}></TextInput>
+            <View style={{ flexDirection: "row" }}>
+              <TextInput
+                style={{
+                  ...style.input,
+                  flex: 1,
+                  paddingRight: 28,
+                  // underlineColorAndroid: "transparent",
+                }}
+                secureTextEntry={!passwordShow}
+              ></TextInput>
+              {passwordShow ? (
+                <Pressable
+                  onPress={() => {
+                    setPasswordShow((prevState) => !prevState);
+                  }}
+                >
+                  <Icon
+                    name="eye-off-outline"
+                    size={20}
+                    color="black"
+                    style={style.passwordIcon}
+                  />
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    setPasswordShow((prevState) => !prevState);
+                  }}
+                >
+                  <Icon
+                    name="eye-off"
+                    size={20}
+                    color="black"
+                    style={style.passwordIcon}
+                  />
+                </Pressable>
+              )}
+            </View>
           </View>
           <View style={{ flexDirection: "row-reverse", paddingTop: 10 }}>
             <Text style={{ fontSize: 12, color: "blue" }}>
@@ -96,7 +159,7 @@ export default () => {
               <Text style={{ textDecorationLine: "underline" }}>SignUp</Text>
             </Text>
           </View>
-        </View>
+        </Animated.View>
       </LinearGradient>
     </View>
   );
@@ -160,5 +223,10 @@ const style = StyleSheet.create({
     // width: "40%",
     height: 10,
     marginBottom: 10, // Optional spacing
+  },
+  passwordIcon: {
+    position: "absolute",
+    right: 5,
+    top: "10%",
   },
 });
