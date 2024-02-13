@@ -22,6 +22,14 @@ import {
   getAllUpazila,
   getAllUnion,
 } from "bd-divisions-to-unions";
+import firebaseAuth from "../config/firebase";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "@firebase/auth";
 
 function capitalizeEveryWord(str) {
   return str.replace(/\b\w/g, function (char) {
@@ -63,7 +71,7 @@ const accountType = [
   { label: "Organization", value: "organization" },
 ];
 
-export default () => {
+export default ({ navigation }) => {
   const [passwordShow, setPasswordShow] = useState(false);
   const [selectedValue, setSelectedValue] = useState("user");
 
@@ -73,21 +81,36 @@ export default () => {
   const [area, setArea] = useState(null);
   const [isAreaFocus, setIsAreaFocus] = useState(false);
 
-  const elementRef = useRef(null);
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [licenseNo, setLicenseNo] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleSignup = async () => {
+    console.log("sign in function workin........");
+    try {
+      // Signed up
+      console.log(email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        firebaseAuth,
+        email+"@app.com",
+        password
+      );
+      console.log("Signed up", userCredential.user);
+      const user = userCredential.user;
+      // ...
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+      console.log("Error...", error.message);
+    }
+  };
 
   const translateY = useRef(new Animated.Value(500)).current;
-  //   const { current: view } = elementRef;
 
-  //   useEffect(() => {
-  //     if (view) {
-  //       view.measure((x, y, width, height, pageX, pageY) => {
-  //         console.log("Padding Top:", pageY - y);
-  //         console.log("Padding Right:", x + width - pageX);
-  //         console.log("Padding Bottom:", y + height - pageY);
-  //         console.log("Padding Left:", pageX - x);
-  //       });
-  //     }
-  //   }, [view]);
   useEffect(() => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -200,6 +223,9 @@ export default () => {
             <TextInput
               style={style.input}
               keyboardType="email-address"
+              value={email}
+              placeholder="yourmail@example.com"
+              onChangeText={(val) => setEmail(val)}
             ></TextInput>
           </View>
           <View style={style.inputContainer}>
@@ -217,6 +243,9 @@ export default () => {
                   // underlineColorAndroid: "transparent",
                 }}
                 secureTextEntry={!passwordShow}
+                value={password}
+                placeholder="Password"
+                onChangeText={(val) => setPassword(val)}
               ></TextInput>
               {passwordShow ? (
                 <Pressable
@@ -254,6 +283,9 @@ export default () => {
               alignItems: "center",
               marginTop: 20,
             }}
+            onPress={() => {
+              console.log("opresss view");
+            }}
           >
             <Text
               style={{
@@ -261,6 +293,10 @@ export default () => {
                 paddingVertical: 5,
                 color: "white",
                 letterSpacing: 2,
+                backgroundColor: "blue",
+              }}
+              onPress={() => {
+                handleSignup();
               }}
             >
               Sign Up
@@ -272,7 +308,12 @@ export default () => {
           >
             <Text>
               Have an account?{" "}
-              <Text style={{ textDecorationLine: "underline" }}>Signin</Text>
+              <Text
+                style={{ textDecorationLine: "underline" }}
+                onPress={() => navigation.replace("Signin")}
+              >
+                Signin
+              </Text>
             </Text>
           </View>
           {/* </KeyboardAvoidingView> */}

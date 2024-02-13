@@ -17,6 +17,10 @@ import Signin from "./Screens/Signin";
 import Signup from "./Screens/Signup";
 import OrganizationList from "./Screens/OrganizationList";
 import CampaignList from "./Screens/CampaignList";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+const Stack = createNativeStackNavigator();
 
 // import { AppearanceProvider } from "react-native-appearance";
 
@@ -35,7 +39,12 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <CampaignList />
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Signin" component={Signin} />
+            <Stack.Screen name="Signup" component={Signup} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </SafeAreaView>
     </SafeAreaProvider>
   );

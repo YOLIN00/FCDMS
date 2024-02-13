@@ -13,10 +13,29 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import TypingAnimation from "../components/TypeAnimation";
 import { useEffect, useState, useRef } from "react";
 
-export default () => {
+import firebaseAuth from "../config/firebase";
+import { signInWithEmailAndPassword } from "@firebase/auth";
+
+export default ({ navigation }) => {
   const [passwordShow, setPasswordShow] = useState(false);
 
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+
   const translateY = useRef(new Animated.Value(500)).current;
+
+  const handleSignin = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        firebaseAuth,
+        phone + "@app.com",
+        password
+      );
+      console.log("User ....", user.user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     Animated.timing(translateY, {
@@ -39,10 +58,16 @@ export default () => {
           <Text style={{ ...style.text, letterSpacing: 10 }}>FCDS</Text>
         </View>
         <Animated.View style={[style.main, { transform: [{ translateY }] }]}>
-          <TypingAnimation style={style.header} text="Welcome Back!"/>
+          <TypingAnimation style={style.header} text="Welcome Back!" />
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Phone:</Text>
-            <TextInput style={style.input} keyboardType="phone-pad"></TextInput>
+            <TextInput
+              style={style.input}
+              keyboardType="phone-pad"
+              Value={phone}
+              placeholder="+8801234567890"
+              onChangeText={(val) => setPhone(val)}
+            ></TextInput>
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Password:</Text>
@@ -55,6 +80,9 @@ export default () => {
                   // underlineColorAndroid: "transparent",
                 }}
                 secureTextEntry={!passwordShow}
+                Value={password}
+                placeholder="Your Password"
+                onChangeText={(val) => setPassword(val)}
               ></TextInput>
               {passwordShow ? (
                 <Pressable
@@ -104,6 +132,7 @@ export default () => {
                 color: "white",
                 letterSpacing: 2,
               }}
+              onPress={handleSignin}
             >
               Login
             </Text>
@@ -156,7 +185,12 @@ export default () => {
           <View style={{ alignItems: "center", paddingTop: 50 }}>
             <Text>
               Don't have an account?{" "}
-              <Text style={{ textDecorationLine: "underline" }}>SignUp</Text>
+              <Text
+                style={{ textDecorationLine: "underline" }}
+                onPress={() => navigation.replace("Signup")}
+              >
+                SignUp
+              </Text>
             </Text>
           </View>
         </Animated.View>
