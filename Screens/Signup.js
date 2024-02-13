@@ -22,6 +22,7 @@ import {
   getAllUpazila,
   getAllUnion,
 } from "bd-divisions-to-unions";
+import { auth } from "../config/firebase";
 
 function capitalizeEveryWord(str) {
   return str.replace(/\b\w/g, function (char) {
@@ -63,7 +64,7 @@ const accountType = [
   { label: "Organization", value: "organization" },
 ];
 
-export default () => {
+export default ({ navigation }) => {
   const [passwordShow, setPasswordShow] = useState(false);
   const [selectedValue, setSelectedValue] = useState("user");
 
@@ -73,21 +74,32 @@ export default () => {
   const [area, setArea] = useState(null);
   const [isAreaFocus, setIsAreaFocus] = useState(false);
 
-  const elementRef = useRef(null);
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [licenseNo, setLicenseNo] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleSignup = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Signed up
+        console.log("Signed up", userCredential);
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+        console.log("Error...", error);
+      });
+  };
 
   const translateY = useRef(new Animated.Value(500)).current;
-  //   const { current: view } = elementRef;
 
-  //   useEffect(() => {
-  //     if (view) {
-  //       view.measure((x, y, width, height, pageX, pageY) => {
-  //         console.log("Padding Top:", pageY - y);
-  //         console.log("Padding Right:", x + width - pageX);
-  //         console.log("Padding Bottom:", y + height - pageY);
-  //         console.log("Padding Left:", pageX - x);
-  //       });
-  //     }
-  //   }, [view]);
   useEffect(() => {
     Animated.timing(translateY, {
       toValue: 0,
@@ -254,6 +266,7 @@ export default () => {
               alignItems: "center",
               marginTop: 20,
             }}
+            onPress={handleSignup}
           >
             <Text
               style={{
@@ -272,7 +285,12 @@ export default () => {
           >
             <Text>
               Have an account?{" "}
-              <Text style={{ textDecorationLine: "underline" }}>Signin</Text>
+              <Text
+                style={{ textDecorationLine: "underline" }}
+                onPress={() => navigation.replace("Signin")}
+              >
+                Signin
+              </Text>
             </Text>
           </View>
           {/* </KeyboardAvoidingView> */}
