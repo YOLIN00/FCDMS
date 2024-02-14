@@ -22,20 +22,21 @@ import {
   getAllUpazila,
   getAllUnion,
 } from "bd-divisions-to-unions";
-import firebaseAuth from "../config/firebase";
+import { app, getAuth } from "../config/firebase";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-} from "@firebase/auth";
+} from "firebase/auth";
 
 function capitalizeEveryWord(str) {
   return str.replace(/\b\w/g, function (char) {
     return char.toUpperCase();
   });
 }
+
+const firebaseAuth = getAuth(app);
 
 const Divisions = getAllDivision("en");
 const Districts = getAllDistrict("en");
@@ -95,7 +96,7 @@ export default ({ navigation }) => {
       console.log(email, password);
       const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
-        email+"@app.com",
+        email + "@app.com",
         password
       );
       console.log("Signed up", userCredential.user);
@@ -276,33 +277,27 @@ export default ({ navigation }) => {
               )}
             </View>
           </View>
-
-          <View
-            style={{
-              backgroundColor: "rgba(0,0,0,0.7)",
-              alignItems: "center",
-              marginTop: 20,
-            }}
-            onPress={() => {
-              console.log("opresss view");
-            }}
-          >
-            <Text
+          <Pressable onPress={handleSignup}>
+            <View
               style={{
-                fontSize: 20,
-                paddingVertical: 5,
-                color: "white",
-                letterSpacing: 2,
-                backgroundColor: "blue",
-              }}
-              onPress={() => {
-                handleSignup();
+                backgroundColor: "rgba(0,0,0,0.7)",
+                alignItems: "center",
+                marginTop: 20,
               }}
             >
-              Sign Up
-            </Text>
-          </View>
-
+              <Text
+                style={{
+                  fontSize: 20,
+                  paddingVertical: 5,
+                  color: "white",
+                  letterSpacing: 2,
+                  // backgroundColor: "blue",
+                }}
+              >
+                Sign Up
+              </Text>
+            </View>
+          </Pressable>
           <View
             style={{ alignItems: "center", paddingTop: 30, paddingBottom: 50 }}
           >
@@ -316,6 +311,7 @@ export default ({ navigation }) => {
               </Text>
             </Text>
           </View>
+
           {/* </KeyboardAvoidingView> */}
         </Animated.ScrollView>
         {/* </KeyboardAvoidingView> */}

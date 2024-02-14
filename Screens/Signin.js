@@ -13,9 +13,9 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import TypingAnimation from "../components/TypeAnimation";
 import { useEffect, useState, useRef } from "react";
 
-import firebaseAuth from "../config/firebase";
-import { signInWithEmailAndPassword } from "@firebase/auth";
-
+import { app, getAuth } from "../config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+const firebaseAuth = getAuth(app);
 export default ({ navigation }) => {
   const [passwordShow, setPasswordShow] = useState(false);
 
@@ -118,25 +118,26 @@ export default ({ navigation }) => {
               Forget Password?
             </Text>
           </View>
-          <View
-            style={{
-              backgroundColor: "rgba(0,0,0,0.7)",
-              alignItems: "center",
-              marginTop: 20,
-            }}
-          >
-            <Text
+          <Pressable onPress={handleSignin}>
+            <View
               style={{
-                fontSize: 20,
-                paddingVertical: 5,
-                color: "white",
-                letterSpacing: 2,
+                backgroundColor: "rgba(0,0,0,0.7)",
+                alignItems: "center",
+                marginTop: 20,
               }}
-              onPress={handleSignin}
             >
-              Login
-            </Text>
-          </View>
+              <Text
+                style={{
+                  fontSize: 20,
+                  paddingVertical: 5,
+                  color: "white",
+                  letterSpacing: 2,
+                }}
+              >
+                Login
+              </Text>
+            </View>
+          </Pressable>
           <View style={{ paddingTop: 50 }}>
             <View
               style={{
