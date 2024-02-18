@@ -12,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "userInterfaceStyle": "light",
       "supportsTablet": true
@@ -22,11 +24,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.jon92.FCDMS"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [["./plugins/withDisableForcedDarkModeAndroid.js", {}]]
+    "plugins": [
+      [
+        "./plugins/withDisableForcedDarkModeAndroid.js",
+        {}
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9d671ad0-2855-4bc4-8731-77f15b605645"
+      }
+    }
   }
 }

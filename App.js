@@ -12,7 +12,7 @@ import {
   SafeAreaInsetsContext,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { app, getAuth } from "./config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Signin from "./Screens/Signin";
@@ -20,12 +20,27 @@ import Signup from "./Screens/Signup";
 import OrganizationList from "./Screens/OrganizationList";
 import CampaignList from "./Screens/CampaignList";
 import { NavigationContainer } from "@react-navigation/native";
+import "react-native-gesture-handler";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import Signout from "./Screens/Signout";
+import Campaign from "./Screens/Campaign";
+import Collections from "./Screens/Collections";
 
 const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
 
-// import { AppearanceProvider } from "react-native-appearance";
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator >
+      <Drawer.Screen name="Collections" component={Collections} />
+      <Drawer.Screen name="Organizations" component={OrganizationList} />
+      <Drawer.Screen name="Campaigns" component={CampaignList} />
+      <Drawer.Screen name="Signout" component={Signout} />
+      <Drawer.Screen name="Campaign" component={Campaign} />
+    </Drawer.Navigator>
+  );
+}
 
 // function AppContainer() {
 //   return (
@@ -36,11 +51,12 @@ const Stack = createNativeStackNavigator();
 // }
 const firebaseAuth = getAuth(app);
 export default function App() {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  // const colorScheme = useColorScheme();
+  // console.log(colorScheme);
+  // const isDarkMode = colorScheme === "dark";
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
       console.log("FROM APP.js..........", user);
       setUser(user);
@@ -49,12 +65,11 @@ export default function App() {
     // Clean up the subscription
     return () => unsubscribe();
   }, []);
-  console.log(colorScheme);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
             {user == null ? (
               <>
                 <Stack.Screen name="Signin" component={Signin} />
@@ -62,8 +77,7 @@ export default function App() {
               </>
             ) : (
               <>
-                <Stack.Screen name="Organization list" component={Signout} />
-                {/* <Stack.Screen name="Signup" component={Signup} /> */}
+                <Stack.Screen name="Drawer" component={DrawerNavigator} />
               </>
             )}
           </Stack.Navigator>

@@ -31,7 +31,7 @@ export default ({ navigation }) => {
         phone + "@app.com",
         password
       );
-      console.log("User ....", user.user);
+      console.log(user.user);
     } catch (error) {
       console.log(error);
     }

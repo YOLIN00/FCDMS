@@ -5,6 +5,8 @@ import {
   initializeAuth,
   getReactNativePersistence,
 } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+
 // import { initializeApp } from '@react-native-firebase/app';
 // import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +21,7 @@ const firebaseConfig = {
   storageBucket: "fcdms-4ef89.appspot.com",
   messagingSenderId: "505373318844",
   appId: "1:505373318844:web:a1e5e1849bcf0ce21f7ab9",
+  databaseURL:"https://fcdms-4ef89-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 // let app
@@ -32,8 +35,10 @@ const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
+const db=getDatabase(app);
+
 
 // const auth = getAuth(app);
 
 // export default auth;
-export { app, auth, getApp, getAuth };
+export { app, auth, getApp, getAuth ,db};

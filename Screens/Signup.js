@@ -22,7 +22,8 @@ import {
   getAllUpazila,
   getAllUnion,
 } from "bd-divisions-to-unions";
-import { app, getAuth } from "../config/firebase";
+import { app, getAuth, db } from "../config/firebase";
+import { set, ref } from "firebase/database";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -76,7 +77,7 @@ export default ({ navigation }) => {
   const [passwordShow, setPasswordShow] = useState(false);
   const [selectedValue, setSelectedValue] = useState("user");
 
-  const [type, setType] = useState(null);
+  const [type, setType] = useState("user");
   const [isTypeFocus, setIsTypeFocus] = useState(false);
 
   const [area, setArea] = useState(null);
@@ -88,19 +89,37 @@ export default ({ navigation }) => {
   const [licenseNo, setLicenseNo] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   const handleSignup = async () => {
-    console.log("sign in function workin........");
+    // console.log("sign in function workin........");
     try {
       // Signed up
-      console.log(email, password);
+      console.log(email, password, phone);
       const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
-        email + "@app.com",
+        phone + "@app.com",
         password
       );
       console.log("Signed up", userCredential.user);
       const user = userCredential.user;
+      const infoObj = {
+        type,
+        address,
+        mail: email,
+        phone,
+        fullname,
+      };
+      if (type != "user") {
+        infoObj = {
+          ...infoObj,
+          licenseNo,
+          servicearea: area,
+        };
+      }
+
+      await set(ref(db, `users/${user.uid}`), infoObj);
+
       // ...
     } catch (error) {
       const errorCode = error.code;
@@ -177,7 +196,12 @@ export default ({ navigation }) => {
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Fullname:</Text>
-            <TextInput style={style.input} keyboardType="default"></TextInput>
+            <TextInput
+              style={style.input}
+              keyboardType="default"
+              value={fullname}
+              onChangeText={(val) => setFullname(val)}
+            ></TextInput>
           </View>
           {type == "organization" && (
             <>
@@ -186,6 +210,8 @@ export default ({ navigation }) => {
                 <TextInput
                   style={style.input}
                   keyboardType="default"
+                  value={phone}
+                  onChangeText={(val) => setPhone(val)}
                 ></TextInput>
               </View>
               <View style={style.inputContainer}>
@@ -217,7 +243,12 @@ export default ({ navigation }) => {
 
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Address:</Text>
-            <TextInput style={style.input} keyboardType="numeric"></TextInput>
+            <TextInput
+              style={style.input}
+              keyboardType="default"
+              value={address}
+              onChangeText={(val) => setAddress(val)}
+            ></TextInput>
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Email:</Text>
@@ -231,7 +262,12 @@ export default ({ navigation }) => {
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Phone:</Text>
-            <TextInput style={style.input} keyboardType="phone-pad"></TextInput>
+            <TextInput
+              style={style.input}
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={(val) => setPhone(val)}
+            ></TextInput>
           </View>
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Password:</Text>
@@ -276,6 +312,17 @@ export default ({ navigation }) => {
                 </Pressable>
               )}
             </View>
+            {error && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  paddingTop: 10,
+                }}
+              >
+                <Text style={{ color: "red" }}>{error}</Text>
+              </View>
+            )}
           </View>
           <Pressable onPress={handleSignup}>
             <View

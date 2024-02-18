@@ -13,7 +13,8 @@ export default () => {
   };
   return (
     <View>
-      <Text>{}</Text>
+      <Text>{firebaseAuth.currentUser.uid}</Text>
+      <Text>{firebaseAuth.currentUser.email}</Text>
       <Text onPress={handleSignOut}>Sign out</Text>
     </View>
   );
