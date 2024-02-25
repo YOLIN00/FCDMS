@@ -9,6 +9,8 @@ export default () => {
       await signOut(firebaseAuth);
     } catch (error) {
       console.log(error);
+      console.log(Object.keys(error));
+      console.log(Object.values(error));
     }
   };
   return (

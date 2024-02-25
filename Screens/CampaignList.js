@@ -1,8 +1,11 @@
 import { View, StyleSheet, Text, ScrollView } from "react-native";
+import { useRoute } from "@react-navigation/native";
 
 export default () => {
+  const route = useRoute();
+  console.log(route.params.id);
   return (
-    <ScrollView contentContainerStyle ={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {[1, 2, 3, 4, 5].map(() => {
         return (
           <View style={styles.card}>

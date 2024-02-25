@@ -8,6 +8,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -16,6 +17,7 @@ import TypingAnimation from "../components/TypeAnimation";
 import { useEffect, useState, useRef } from "react";
 import { Picker } from "@react-native-picker/picker";
 import { Dropdown } from "react-native-element-dropdown";
+import * as Network from "expo-network";
 import {
   getAllDivision,
   getAllDistrict,
@@ -45,7 +47,7 @@ const Upazillas = getAllUpazila("en");
 const Unions = getAllUnion("en");
 
 const AllAreas = [
-  { value: 0, title: "Bangladesh" },
+  { value: 9999, title: "Bangladesh" },
   ...Divisions.map((item) => {
     return { ...item, title: capitalizeEveryWord(item.title + " Divison") };
   }),
@@ -90,11 +92,38 @@ export default ({ navigation }) => {
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [description, setDescription] = useState("");
+  const [estd, setEstd] = useState("");
 
   const handleSignup = async () => {
     // console.log("sign in function workin........");
     try {
       // Signed up
+      const { isInternetReachable } = await Network.getNetworkStateAsync();
+      console.log("isInternetReachable", isInternetReachable);
+      if (!isInternetReachable) {
+        return ToastAndroid.showWithGravity(
+          "No internet connection",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      if (
+        !fullname ||
+        !password ||
+        !phone ||
+        !address ||
+        !email ||
+        (type == "organization" &&
+          (!licenseNo || !area || !description || !estd))
+      ) {
+        return ToastAndroid.showWithGravity(
+          "No field should be empty",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      }
       console.log(email, password, phone);
       const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
@@ -109,23 +138,24 @@ export default ({ navigation }) => {
         mail: email,
         phone,
         fullname,
+        createdAt: new Date(),
       };
-      if (type != "user") {
-        infoObj = {
-          ...infoObj,
-          licenseNo,
-          servicearea: area,
-        };
+      if (type == "organization") {
+        infoObj["licenseNo"] = licenseNo;
+        infoObj["serviceArea"] = area;
+        infoObj["estd"] = estd;
+        infoObj["description"] = description;
       }
 
       await set(ref(db, `users/${user.uid}`), infoObj);
-
+      setError("");
       // ...
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
       // ..
       console.log("Error...", error.message);
+      setError("Something Went wrong");
     }
   };
 
@@ -141,7 +171,10 @@ export default ({ navigation }) => {
 
   return (
     <View style={style.container}>
-      <LinearGradient style={style.background} colors={["#4568DC", "#B06AB3"]}>
+      <LinearGradient
+        style={style.background}
+        colors={["rgba(0,0,0,0.9)", "#fff"]}
+      >
         <View
           style={{
             justifyContent: "center",
@@ -210,8 +243,8 @@ export default ({ navigation }) => {
                 <TextInput
                   style={style.input}
                   keyboardType="default"
-                  value={phone}
-                  onChangeText={(val) => setPhone(val)}
+                  value={licenseNo}
+                  onChangeText={(val) => setLicenseNo(val)}
                 ></TextInput>
               </View>
               <View style={style.inputContainer}>
@@ -237,6 +270,25 @@ export default ({ navigation }) => {
                     setIsAreaFocus(false);
                   }}
                 />
+              </View>
+              <View style={style.inputContainer}>
+                <Text style={style.inputText}>ESTD:</Text>
+                <TextInput
+                  style={style.input}
+                  keyboardType="phone-pad"
+                  value={estd}
+                  onChangeText={(val) => setEstd(val)}
+                ></TextInput>
+              </View>
+              <View style={style.inputContainer}>
+                <Text style={style.inputText}>Description:</Text>
+                <TextInput
+                  style={style.input}
+                  keyboardType="phone-pad"
+                  value={description}
+                  multiline={true}
+                  onChangeText={(val) => setDescription(val)}
+                ></TextInput>
               </View>
             </>
           )}
@@ -269,6 +321,7 @@ export default ({ navigation }) => {
               onChangeText={(val) => setPhone(val)}
             ></TextInput>
           </View>
+
           <View style={style.inputContainer}>
             <Text style={style.inputText}>Password:</Text>
             <View style={{ flexDirection: "row" }}>
@@ -395,7 +448,7 @@ const style = StyleSheet.create({
   text: {
     backgroundColor: "transparent",
     fontSize: 30,
-    color: "#ffff00",
+    color: "#fff",
   },
   header: {
     fontSize: 30,

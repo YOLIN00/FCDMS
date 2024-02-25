@@ -14,7 +14,8 @@ import {
 } from "react-native-safe-area-context";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { app, getAuth } from "./config/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, db } from "firebase/auth";
+import { get, ref, child, getDatabase } from "firebase/database";
 import Signin from "./Screens/Signin";
 import Signup from "./Screens/Signup";
 import OrganizationList from "./Screens/OrganizationList";
@@ -26,15 +27,23 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import Signout from "./Screens/Signout";
 import Campaign from "./Screens/Campaign";
 import Collections from "./Screens/Collections";
+import Payment from "./Screens/Payment";
+import CreateCampaign from "./Screens/CreateCampaign";
+import AddRecipient from "./Screens/AddRecipient";
+import Donations from "./Screens/Donations";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 function DrawerNavigator() {
   return (
-    <Drawer.Navigator >
-      <Drawer.Screen name="Collections" component={Collections} />
+    <Drawer.Navigator>
+      {/* <Drawer.Screen name="CampaignCreate" component={CreateCampaign} /> */}
+      {/* <Drawer.Screen name="Payment" component={Payment} /> */}
+      <Drawer.Screen name="Donations" component={Donations} />
+      <Drawer.Screen name="AddRecipient" component={AddRecipient} />
       <Drawer.Screen name="Organizations" component={OrganizationList} />
+      <Drawer.Screen name="Collections" component={Collections} />
       <Drawer.Screen name="Campaigns" component={CampaignList} />
       <Drawer.Screen name="Signout" component={Signout} />
       <Drawer.Screen name="Campaign" component={Campaign} />
@@ -55,16 +64,37 @@ export default function App() {
   // console.log(colorScheme);
   // const isDarkMode = colorScheme === "dark";
   const [user, setUser] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
 
   useLayoutEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-      console.log("FROM APP.js..........", user);
+      console.log("FROM APP.js..........", user?.uid);
       setUser(user);
     });
 
     // Clean up the subscription
     return () => unsubscribe();
   }, []);
+  useEffect(() => {
+    if (user) {
+      get(child(ref(getDatabase()), `users/${user.uid}`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            console.log(snapshot.val());
+            // setUserInfo(snapshot.val());
+          } else {
+            console.log("No data available");
+            // setUserInfo(null);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          // setUserInfo(null);
+        });
+    } else {
+      // setUserInfo(null);
+    }
+  }, [user]);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>

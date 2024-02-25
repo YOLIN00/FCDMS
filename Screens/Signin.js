@@ -6,13 +6,14 @@ import {
   TextInput,
   Animated,
   Pressable,
+  ToastAndroid,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import TypingAnimation from "../components/TypeAnimation";
 import { useEffect, useState, useRef } from "react";
-
+import * as Network from "expo-network";
 import { app, getAuth } from "../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 const firebaseAuth = getAuth(app);
@@ -21,19 +22,44 @@ export default ({ navigation }) => {
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const translateY = useRef(new Animated.Value(500)).current;
 
   const handleSignin = async () => {
     try {
+      const { isInternetReachable } = await Network.getNetworkStateAsync();
+      console.log("isInternetReachable", isInternetReachable);
+      if (!isInternetReachable) {
+        return ToastAndroid.showWithGravity(
+          "No internet connection",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+      if (phone.length == 0 && password.length == 0) {
+        return ToastAndroid.showWithGravity(
+          "No field should be empty",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      }
       const user = await signInWithEmailAndPassword(
         firebaseAuth,
         phone + "@app.com",
         password
       );
+      setError(null);
       console.log(user.user);
     } catch (error) {
       console.log(error);
+      console.log(Object.keys(error));
+      console.log(Object.values(error));
+      if (error.code == "auth/invalid-credential") {
+        setError("Invalid phone or password");
+      } else {
+        setError("Something went wrong");
+      }
     }
   };
 
@@ -47,7 +73,10 @@ export default ({ navigation }) => {
 
   return (
     <View style={style.container}>
-      <LinearGradient style={style.background} colors={["#4568DC", "#B06AB3"]}>
+      <LinearGradient
+        style={style.background}
+        colors={["rgba(0,0,0,0.9)", "#fff"]}
+      >
         <View
           style={{
             justifyContent: "center",
@@ -66,7 +95,9 @@ export default ({ navigation }) => {
               keyboardType="phone-pad"
               Value={phone}
               placeholder="+8801234567890"
-              onChangeText={(val) => setPhone(val)}
+              onChangeText={(val) => {
+                setPhone(val), setError("");
+              }}
             ></TextInput>
           </View>
           <View style={style.inputContainer}>
@@ -82,7 +113,9 @@ export default ({ navigation }) => {
                 secureTextEntry={!passwordShow}
                 Value={password}
                 placeholder="Your Password"
-                onChangeText={(val) => setPassword(val)}
+                onChangeText={(val) => {
+                  setPassword(val), setError("");
+                }}
               ></TextInput>
               {passwordShow ? (
                 <Pressable
@@ -118,6 +151,12 @@ export default ({ navigation }) => {
               Forget Password?
             </Text>
           </View>
+          {error && (
+            <View style={{ paddingVertical: 20, alignItems: "center" }}>
+              <Text style={{ color: "red", fontSize: 15 }}>{error}</Text>
+            </View>
+          )}
+
           <Pressable onPress={handleSignin}>
             <View
               style={{
@@ -227,7 +266,7 @@ const style = StyleSheet.create({
   text: {
     backgroundColor: "transparent",
     fontSize: 30,
-    color: "#ffff00",
+    color: "#fff",
   },
   header: {
     fontSize: 30,
