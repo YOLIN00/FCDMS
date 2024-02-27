@@ -1,7 +1,11 @@
+import { useRoute } from "@react-navigation/native";
 import { View, Text, StyleSheet } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 export default () => {
+  const router = useRoute();
+  const { id } = router.params; //campaignid
+  console.log("collections  ", id);
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -11,7 +15,29 @@ export default () => {
           placeholderTextColor="white"
         />
       </View>
-      
+      <View style={styles.table}>
+        <Text style={styles.tableTitle}>
+          Transaction list for all collection :
+        </Text>
+        <View style={styles.tableHeader}>
+          <Text style={[styles.tableHeaderText, { width: "40%" }]}>Name</Text>
+          <Text style={[styles.tableHeaderText, { width: "30%" }]}>Amount</Text>
+          <Text style={[styles.tableHeaderText, { width: "30%" }]}>Date</Text>
+        </View>
+        {[0, 0.1, 2, 300, 4, 5].map((item) => {
+          return (
+            <View style={styles.tableRow}>
+              <Text style={{ ...styles.tableRowText, width: "40%" }}>
+                {9847894 * item}
+              </Text>
+              <Text style={[styles.tableRowText, { width: "30%" }]}>50</Text>
+              <Text style={[styles.tableRowText, { width: "30%" }]}>
+                12-3-34
+              </Text>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 };

@@ -12,7 +12,7 @@ import {
   SafeAreaInsetsContext,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useContext } from "react";
 import { app, getAuth } from "./config/firebase";
 import { onAuthStateChanged, db } from "firebase/auth";
 import { get, ref, child, getDatabase } from "firebase/database";
@@ -24,7 +24,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import Signout from "./Screens/Signout";
+import { UserContext } from "./context/UserContext.js";
+
+import Profile from "./Screens/Profile.js";
 import Campaign from "./Screens/Campaign";
 import Collections from "./Screens/Collections";
 import Payment from "./Screens/Payment";
@@ -36,16 +38,19 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 function DrawerNavigator() {
+  const { userInfo } = useContext(UserContext);
   return (
     <Drawer.Navigator>
-      {/* <Drawer.Screen name="CampaignCreate" component={CreateCampaign} /> */}
-      {/* <Drawer.Screen name="Payment" component={Payment} /> */}
-      <Drawer.Screen name="Donations" component={Donations} />
-      <Drawer.Screen name="AddRecipient" component={AddRecipient} />
       <Drawer.Screen name="Organizations" component={OrganizationList} />
+      <Drawer.Screen name="Payment" component={Payment} />
+      <Drawer.Screen name="CampaignCreate" component={CreateCampaign} />
+      <Drawer.Screen name="Donations" component={Donations} />
+      {userInfo?.type == "organization" && (
+        <Drawer.Screen name="AddRecipient" component={AddRecipient} />
+      )}
       <Drawer.Screen name="Collections" component={Collections} />
       <Drawer.Screen name="Campaigns" component={CampaignList} />
-      <Drawer.Screen name="Signout" component={Signout} />
+      <Drawer.Screen name="Profile" component={Profile} />
       <Drawer.Screen name="Campaign" component={Campaign} />
     </Drawer.Navigator>
   );
@@ -80,38 +85,40 @@ export default function App() {
       get(child(ref(getDatabase()), `users/${user.uid}`))
         .then((snapshot) => {
           if (snapshot.exists()) {
-            console.log(snapshot.val());
-            // setUserInfo(snapshot.val());
+            console.log("app.js set user", snapshot.val());
+            setUserInfo(snapshot.val());
           } else {
             console.log("No data available");
-            // setUserInfo(null);
+            setUserInfo(null);
           }
         })
         .catch((error) => {
           console.error(error);
-          // setUserInfo(null);
+          setUserInfo(null);
         });
     } else {
-      // setUserInfo(null);
+      setUserInfo(null);
     }
   }, [user]);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {user == null ? (
-              <>
-                <Stack.Screen name="Signin" component={Signin} />
-                <Stack.Screen name="Signup" component={Signup} />
-              </>
-            ) : (
-              <>
-                <Stack.Screen name="Drawer" component={DrawerNavigator} />
-              </>
-            )}
-          </Stack.Navigator>
-        </NavigationContainer>
+        <UserContext.Provider value={{ userInfo }}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              {user == null ? (
+                <>
+                  <Stack.Screen name="Signin" component={Signin} />
+                  <Stack.Screen name="Signup" component={Signup} />
+                </>
+              ) : (
+                <>
+                  <Stack.Screen name="Drawer" component={DrawerNavigator} />
+                </>
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </UserContext.Provider>
       </SafeAreaView>
     </SafeAreaProvider>
   );

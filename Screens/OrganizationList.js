@@ -17,8 +17,9 @@ const blurhash =
 
 export default () => {
   const [organizations, setOgranizations] = useState([]);
-  const usersRef = child(ref(getDatabase()), "users");
   const navigation = useNavigation();
+  const usersRef = child(ref(getDatabase()), "users");
+  
   useEffect(() => {
     get(usersRef)
       .then((snapshot) => {
