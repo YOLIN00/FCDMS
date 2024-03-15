@@ -15,13 +15,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB_2J9ADB8o4LNpuEqL1nUnd1mN61dyUrM",
-  authDomain: "fcdms-4ef89.firebaseapp.com",
-  projectId: "fcdms-4ef89",
-  storageBucket: "fcdms-4ef89.appspot.com",
-  messagingSenderId: "505373318844",
-  appId: "1:505373318844:web:a1e5e1849bcf0ce21f7ab9",
-  databaseURL:"https://fcdms-4ef89-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  apiKey: ,
+  authDomain: ,
+  projectId: ,
+  storageBucket: ,
+  messagingSenderId: ,
+  appId: ,
+  databaseURL:
 };
 
 // let app
